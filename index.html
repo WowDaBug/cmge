@@ -103,9 +103,23 @@
     <script>
 window.onload = function() {
     loadFavorites();
-    document.getElementById("gameUrl").value = ""; // Clear input
-    document.getElementById("gameFrame").src = "about:blank"; // Reset embedded game
+    
+    // Clear input value and prevent browser caching it
+    let input = document.getElementById("gameUrl");
+    input.value = "";
+    input.setAttribute("autocomplete", "off"); // Prevent autofill
+
+    // Fully reset the iframe to clear any previously loaded game
+    let oldFrame = document.getElementById("gameFrame");
+    let newFrame = document.createElement("iframe");
+    newFrame.id = "gameFrame";
+    newFrame.style.width = "100%";
+    newFrame.style.height = "100%";
+    newFrame.style.border = "none";
+
+    oldFrame.parentNode.replaceChild(newFrame, oldFrame);
 };
+
 
         function embedGame() {
             let url = document.getElementById("gameUrl").value.trim();
