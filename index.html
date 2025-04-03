@@ -11,7 +11,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: black;
+			background: black;
         }
         #gameFrame {
             width: 100%;
@@ -109,10 +109,17 @@ window.onload = function() {
     input.value = "";
     input.setAttribute("autocomplete", "off"); // Prevent autofill
 
-    // Reset the iframe by removing any previously loaded game
-    let gameFrame = document.getElementById("gameFrame");
-    gameFrame.src = "about:blank";
+    // Fully reset the iframe to clear any previously loaded game
+    let oldFrame = document.getElementById("gameFrame");
+    let newFrame = document.createElement("iframe");
+    newFrame.id = "gameFrame";
+    newFrame.style.width = "100%";
+    newFrame.style.height = "100%";
+    newFrame.style.border = "none";
+
+    oldFrame.parentNode.replaceChild(newFrame, oldFrame);
 };
+
 
         function embedGame() {
             let url = document.getElementById("gameUrl").value.trim();
@@ -169,7 +176,7 @@ window.onload = function() {
         }
         
         function loadFavorites() {
-            localStorage.removeItem("gameUrl");
+		    localStorage.removeItem("gameUrl");
             let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
             let list = document.getElementById("favoritesList");
             list.innerHTML = "";
@@ -200,7 +207,7 @@ window.onload = function() {
         }
     </script>
 </head>
-<body>
+<body onload="loadFavorites()">
     <iframe id="gameFrame"></iframe>
     <div id="controls" class="controls-container">
         <h2>Coolmath Games Embedder</h2>
