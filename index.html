@@ -101,11 +101,6 @@
         }
     </style>
     <script>
-window.onload = function() {
-    loadFavorites();
-    let input = document.getElementById("gameUrl");
-    input.setAttribute("autocomplete", "off");
-};
         function embedGame() {
             let url = document.getElementById("gameUrl").value.trim();
             if (!url.startsWith("https://www.coolmathgames.com/")) {
