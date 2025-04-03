@@ -176,6 +176,7 @@ window.onload = function() {
         }
         
         function loadFavorites() {
+		    localStorage.removeItem("gameUrl");
             let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
             let list = document.getElementById("favoritesList");
             list.innerHTML = "";
