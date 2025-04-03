@@ -101,36 +101,6 @@
         }
     </style>
     <script>
-        function embedGame() {
-            let url = document.getElementById("gameUrl").value.trim();
-            if (!url.startsWith("https://www.coolmathgames.com/")) {
-                alert("Please enter a valid Coolmath Games URL.");
-                return;
-            }
-            
-            let embedUrl = url + "/play";
-            
-            fetch(embedUrl)
-                .then(response => response.text())
-                .then(html => {
-                    let parser = new DOMParser();
-                    let doc = parser.parseFromString(html, "text/html");
-                    let baseTag = doc.querySelector("base");
-                    
-                    if (baseTag) {
-                        let baseHref = baseTag.getAttribute("href");
-                        let gameFrame = document.getElementById("gameFrame");
-                        gameFrame.src = "https:" + baseHref + "index.html";
-                    } else {
-                        alert("Failed to find the game's embed URL.");
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching game page:", error);
-                    alert("Error fetching game page.");
-                });
-        }
-        
         function toggleFavoritesMenu() {
             let menu = document.getElementById("favoritesMenu");
             menu.style.display = menu.style.display === "block" ? "none" : "block";
@@ -183,6 +153,36 @@
                 item.appendChild(removeBtn);
                 list.appendChild(item);
             });
+			console.log('favorites loaded');
+        }
+        function embedGame() {
+            let url = document.getElementById("gameUrl").value.trim();
+            if (!url.startsWith("https://www.coolmathgames.com/")) {
+                alert("Please enter a valid Coolmath Games URL.");
+                return;
+            }
+            
+            let embedUrl = url + "/play";
+            
+            fetch(embedUrl)
+                .then(response => response.text())
+                .then(html => {
+                    let parser = new DOMParser();
+                    let doc = parser.parseFromString(html, "text/html");
+                    let baseTag = doc.querySelector("base");
+                    
+                    if (baseTag) {
+                        let baseHref = baseTag.getAttribute("href");
+                        let gameFrame = document.getElementById("gameFrame");
+                        gameFrame.src = "https:" + baseHref + "index.html";
+                    } else {
+                        alert("Failed to find the game's embed URL.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching game page:", error);
+                    alert("Error fetching game page.");
+                });
         }
     </script>
 </head>
