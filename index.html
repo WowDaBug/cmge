@@ -101,12 +101,11 @@
         }
     </style>
     <script>
-window.onload = function() {
+	window.onload = function() {
     loadFavorites();
     document.getElementById("gameUrl").value = ""; // Clear input
-    document.getElementById("gameFrame").src = "about:blank"; // Reset embedded game
+    document.getElementById("gameFrame").src = ""; // Clear embedded game
 };
-
         function embedGame() {
             let url = document.getElementById("gameUrl").value.trim();
             if (!url.startsWith("https://www.coolmathgames.com/")) {
