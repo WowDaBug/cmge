@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coolmath Games Embedder</title>
-	<link rel="icon" type="image/png" href="favicon.png">
+    <title>CMGE</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <style>
       body,
       html {
@@ -122,9 +122,14 @@
       function saveFavorite() {
         let url = document.getElementById("gameUrl").value.trim();
         if (!url) return;
+        let rawName = url.replace("https://www.coolmathgames.com/", "");
+        let name = rawName.replace(/^[0-9]+-*/, "").replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
         let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-        if (!favorites.includes(url)) {
-          favorites.push(url);
+        if (!favorites.some(fav => fav.url === url)) {
+          favorites.push({
+            url,
+            name
+          });
           localStorage.setItem("favorites", JSON.stringify(favorites));
         }
         loadFavorites();
@@ -132,7 +137,7 @@
 
       function removeFavorite(url) {
         let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-        favorites = favorites.filter(fav => fav !== url);
+        favorites = favorites.filter(fav => fav.url !== url);
         localStorage.setItem("favorites", JSON.stringify(favorites));
         loadFavorites();
       }
@@ -141,13 +146,12 @@
         let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
         let list = document.getElementById("favoritesList");
         list.innerHTML = "";
-        favorites.forEach(url => {
+        favorites.forEach(fav => {
           let item = document.createElement("div");
-          let displayUrl = url.replace("https://www.coolmathgames.com/", "");
           let text = document.createElement("span");
-          text.textContent = displayUrl;
+          text.textContent = fav.name;
           text.onclick = () => {
-            document.getElementById("gameUrl").value = url;
+            document.getElementById("gameUrl").value = fav.url;
             embedGame();
           };
           let removeBtn = document.createElement("button");
@@ -155,7 +159,7 @@
           removeBtn.className = "remove-btn";
           removeBtn.onclick = (e) => {
             e.stopPropagation();
-            removeFavorite(url);
+            removeFavorite(fav.url);
           };
           item.appendChild(text);
           item.appendChild(removeBtn);
@@ -170,37 +174,41 @@
           return;
         }
         let embedUrl = url + "/play";
-        fetch(embedUrl).then(response => response.text()).then(html => {
-          let parser = new DOMParser();
-          let doc = parser.parseFromString(html, "text/html");
-          let baseTag = doc.querySelector("base");
-          if (baseTag) {
-            let baseHref = baseTag.getAttribute("href");
-            let gameFrame = document.getElementById("gameFrame");
-            gameFrame.src = "https:" + baseHref + "index.html";
-          } else {
-            alert("Failed to find the game's embed URL");
-          }
-        }).catch(error => {
-          console.error("Error fetching game page:", error);
-          alert("Error fetching game page.");
-        });
-      }
+        fetch(embedUrl).then(response => {
+          if (!response.ok) throw new Error("primary url failed");
+          return response.text();
+        }).then(html => {
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(html, "text/html");
+            let baseTag = doc.querySelector("base");
+            if (baseTag) {
+              let baseHref = baseTag.getAttribute("href");
+              document.getElementById("gameFrame").src = "https:" + baseHref + "index.html";
+            } else {
+              throw new Error("no  < base > tag ");
+              }
+            }).catch(error => {
+            console.warn("embed failed", error);
+            let gameName = url.replace("https://www.coolmathgames.com/", "").replace(/^[0-9]+-*/, "").replace(/-/g, '').toLowerCase();
+            let fallbackUrl = `https://${gameName}.coolmathgames.com`;
+            document.getElementById("gameFrame").src = fallbackUrl;
+          });
+        }
     </script>
   </head>
   <body onload="loadFavorites()">
     <iframe id="gameFrame"></iframe>
     <div id="controls" class="controls-container">
-      <h2>Coolmath Games Embedder</h2>
+      <h2>CMGE</h2>
       <div style="display: flex; align-items: center; gap: 10px;">
         <button onclick="toggleFavoritesMenu()">⭐</button>
         <input type="text" id="gameUrl" placeholder="Enter Game URL">
-        <button onclick="embedGame()">Embed</button>
+        <button onclick="embedGame()">Load</button>
         <button onclick="saveFavorite()">Save</button>
       </div>
     </div>
     <div id="favoritesMenu">
-      <h3>Favorites</h3>
+      <h3>Saved Games</h3>
       <div id="favoritesList"></div>
     </div>
   </body>
